@@ -48,9 +48,12 @@ const ShodoSearch = (() => {
     try {
       const places = await fetchPlaces(query, origin.latLng);
       const sortedPlaces = places
-        .map((place) => toSearchResult(place, origin))
+        .map((place) => toSearchResult(place, origin, query))
         .filter(Boolean)
-        .sort((a, b) => a.distance - b.distance);
+        .sort((a, b) => {
+          const byRelevance = b.relevance - a.relevance;
+          return byRelevance !== 0 ? byRelevance : a.distance - b.distance;
+        });
 
       renderResults(sortedPlaces, origin.isUserLocation);
       setStatus(
@@ -109,7 +112,7 @@ const ShodoSearch = (() => {
     };
   }
 
-  function toSearchResult(place, origin) {
+  function toSearchResult(place, origin, query) {
     const lat = Number(place.lat);
     const lon = Number(place.lon);
 
@@ -124,7 +127,33 @@ const ShodoSearch = (() => {
       address: displayName,
       latLng,
       distance: origin.latLng.distanceTo(latLng),
+      relevance: calcRelevanceScore(place, query || ""),
     };
+  }
+
+  function calcRelevanceScore(place, query) {
+    const name = (place.name || "").trim();
+    const q = query.trim();
+    let score = 0;
+
+    if (name === q) score += 100;
+    else if (name.startsWith(q)) score += 60;
+    else if (name.includes(q)) score += 20;
+    else if (q.length > 1 && q.startsWith(name)) score += 10;
+
+    const cat = place.category || "";
+    const type = place.type || "";
+    const isTransit = cat === "railway" || cat === "public_transport" ||
+                      type === "station" || type === "halt" || type === "subway_entrance";
+
+    if (isTransit) {
+      score += q.includes("駅") ? 50 : 5;
+    }
+
+    const importance = Number(place.importance);
+    if (Number.isFinite(importance)) score += importance * 15;
+
+    return score;
   }
 
   function renderResults(results, isUserLocation) {

@@ -11,6 +11,14 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
+requestAnimationFrame(() => map.invalidateSize());
+setTimeout(() => map.invalidateSize(), 400);
+
+window.addEventListener("resize", () => map.invalidateSize());
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", () => map.invalidateSize());
+}
+
 ShodoLocation.initLocation(map, {
   statusElement: document.querySelector("#locationStatus"),
   refreshButton: document.querySelector("#refreshLocationButton"),
