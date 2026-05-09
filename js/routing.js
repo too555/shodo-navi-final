@@ -1,6 +1,8 @@
 const ShodoRouting = (() => {
   const ROUTING_ENDPOINT = "https://routing.openstreetmap.de/routed-foot/route/v1/foot";
   const WALKING_SPEED_METERS_PER_MINUTE = 80;
+  const STRAIGHT_LINE_MAX_METERS = 100000;
+  const ROUTE_MAX_METERS = 50000;
 
   let map;
   let routeStatusElement;
@@ -55,11 +57,25 @@ const ShodoRouting = (() => {
   async function buildWalkingRoute(start, destination) {
     if (isRouting) return;
 
+    const straightLine = start.distanceTo(destination.latLng);
+    if (straightLine > STRAIGHT_LINE_MAX_METERS) {
+      const km = Math.round(straightLine / 1000);
+      showRouteStatus(`遠すぎるため徒歩ルートを表示できません（直線距離 約${km}km）`, false);
+      return;
+    }
+
     isRouting = true;
     showRouteStatus("徒歩ルートを取得しています...", false);
 
     try {
       const route = await fetchWalkingRoute(start, destination.latLng);
+
+      if (route.distance > ROUTE_MAX_METERS) {
+        const km = Math.round(route.distance / 1000);
+        showRouteStatus(`遠すぎるため徒歩ルートを表示できません（徒歩 約${km}km）`, false);
+        return;
+      }
+
       const routeLatLngs = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
 
       if (routeLine) {

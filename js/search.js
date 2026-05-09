@@ -46,14 +46,18 @@ const ShodoSearch = (() => {
     clearResults();
 
     try {
-      const places = await fetchPlaces(query);
+      const places = await fetchPlaces(query, origin.latLng);
       const sortedPlaces = places
         .map((place) => toSearchResult(place, origin))
         .filter(Boolean)
         .sort((a, b) => a.distance - b.distance);
 
       renderResults(sortedPlaces, origin.isUserLocation);
-      setStatus(sortedPlaces.length ? `${sortedPlaces.length}件見つかりました。` : "検索結果がありません。");
+      setStatus(
+        sortedPlaces.length
+          ? `${sortedPlaces.length}件見つかりました。目的地を選んでください。`
+          : "検索結果がありません。"
+      );
     } catch (error) {
       setStatus("検索に失敗しました。通信状況を確認してください。");
       clearResults();
@@ -62,14 +66,25 @@ const ShodoSearch = (() => {
     }
   }
 
-  async function fetchPlaces(query) {
+  async function fetchPlaces(query, currentLatLng) {
     const url = new URL("https://nominatim.openstreetmap.org/search");
     url.searchParams.set("format", "jsonv2");
     url.searchParams.set("q", query);
     url.searchParams.set("limit", "10");
     url.searchParams.set("addressdetails", "1");
     url.searchParams.set("accept-language", "ja");
-    url.searchParams.set("bounded", "0");
+    url.searchParams.set("countrycodes", "jp");
+
+    if (currentLatLng) {
+      const delta = 1.5;
+      url.searchParams.set("viewbox", [
+        (currentLatLng.lng - delta).toFixed(4),
+        (currentLatLng.lat + delta).toFixed(4),
+        (currentLatLng.lng + delta).toFixed(4),
+        (currentLatLng.lat - delta).toFixed(4),
+      ].join(","));
+      url.searchParams.set("bounded", "0");
+    }
 
     const response = await fetch(url.toString(), {
       headers: {
