@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="初動ナビ">
+  <rect width="512" height="512" rx="112" fill="#0f766e"/>
+  <path d="M256 72c75 0 138 61 138 138 0 103-138 229-138 229S118 313 118 210c0-77 63-138 138-138Z" fill="#ffffff"/>
+  <circle cx="256" cy="210" r="48" fill="#0f766e"/>
+  <path d="M160 382h192" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+</svg>
