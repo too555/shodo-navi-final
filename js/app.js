@@ -12,7 +12,8 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 requestAnimationFrame(() => map.invalidateSize());
-setTimeout(() => map.invalidateSize(), 400);
+setTimeout(() => map.invalidateSize(), 500);
+window.addEventListener("load", () => map.invalidateSize());
 
 window.addEventListener("resize", () => map.invalidateSize());
 if (window.visualViewport) {

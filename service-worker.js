@@ -1,4 +1,4 @@
-const CACHE_NAME = "shodo-navi-final-v4";
+const CACHE_NAME = "shodo-navi-final-v5";
 
 const APP_SHELL = [
   "./",

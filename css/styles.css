@@ -37,17 +37,14 @@ button {
 }
 
 .app-shell {
-  position: fixed;
-  inset: 0;
+  height: 100%;
   min-width: 320px;
-  min-height: 100svh;
   background: var(--app-bg);
 }
 
 .map-stage {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
+  width: 100%;
+  height: 100%;
   background: #dfe9e2;
 }
 
@@ -234,7 +231,7 @@ input[type="search"]:focus {
 
 @supports (height: 100dvh) {
   .app-shell {
-    min-height: 100dvh;
+    height: 100dvh;
   }
 }
 
